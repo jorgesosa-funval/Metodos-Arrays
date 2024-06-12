@@ -1002,8 +1002,16 @@ const books = [
 ]
 
 const book_list = document.querySelector('.book_list')
-const search  = document.querySelector('#search')
+const search = document.querySelector('#search')
+const busquedas_recientes = document.querySelector('#busquedas_recientes')
 all(books, book_list)
+
+if (localStorage.getItem('rc') === null) {
+    localStorage.setItem('rc', JSON.stringify([]))
+}
+
+
+const recientes = JSON.parse(localStorage.getItem('rc'));
 
 function all(array, list) {
     list.innerHTML = '';
@@ -1029,7 +1037,7 @@ function loadBooks({ author, imageLink, pages, title, year }, list) {
     `
     list.innerHTML += li_template;
 
-} 
+}
 
 
 function loadBooks2_0({ author, imageLink, pages, title, year }, list) {
@@ -1063,20 +1071,37 @@ function loadBooks2_0({ author, imageLink, pages, title, year }, list) {
     list.appendChild(li)
 
 }
- 
 
 function filterBooks(array, list, searchInput) {
-        const searchValue = searchInput.value.toLowerCase();
-        const filterData = array.filter(book => book.title.toLowerCase().includes(searchValue))
- 
-        all(filterData, list)
+    const searchValue = searchInput.value.toLowerCase();
+    const filterData = array.filter(book => book.title.toLowerCase().includes(searchValue))
+
+    all(filterData, list)
 }
 
- 
+search.addEventListener('keydown', (e) => {
 
+    if (e.keyCode === 13) {
+        filterBooks(books, book_list, search)
+        if (recientes.length === 6) {
+            recientes.pop()
+        }
+        recientes.unshift(search.value)
+        localStorage.setItem('rc', JSON.stringify(recientes))
+    }
 
-search.addEventListener('input',  ()=> filterBooks(books, book_list, search))
+})
 
- 
+search.addEventListener('click', () => {
+    busquedas_recientes.style.display = 'block'
+})
+busquedas_recientes.addEventListener('click', (e) => {
+    const target = e.target;
 
- 
+    if (target.tagName === 'LI') {
+        console.log(target.id);
+        busquedas_recientes.style.display = 'none'
+    }
+})
+
+console.log(recientes);
