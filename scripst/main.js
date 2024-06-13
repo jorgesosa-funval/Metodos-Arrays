@@ -1021,7 +1021,7 @@ function all(array, list) {
     });
 
 }
-
+/* Cargar los libros utilizando innerHTML */
 function loadBooks({ author, imageLink, pages, title, year }, list) {
     const li_template = `
             <li class="book_item" >
@@ -1039,7 +1039,7 @@ function loadBooks({ author, imageLink, pages, title, year }, list) {
 
 }
 
-
+/* Cargar los libros utilizando documen.createElement */
 function loadBooks2_0({ author, imageLink, pages, title, year }, list) {
     const li = document.createElement('li');
     li.classList.add('book_item');
@@ -1071,37 +1071,53 @@ function loadBooks2_0({ author, imageLink, pages, title, year }, list) {
     list.appendChild(li)
 
 }
-
-function filterBooks(array, list, searchInput) {
-    const searchValue = searchInput.value.toLowerCase();
-    const filterData = array.filter(book => book.title.toLowerCase().includes(searchValue))
+/* Realizar un filtro de los libro basado en una busqueda por titulo del libro */
+function filterBooks(array, list, searchvalue) {
+ 
+    const filterData = array.filter(book => book.title.toLowerCase().includes(searchvalue.toLowerCase()))
 
     all(filterData, list)
 }
+/* Cargar historial del busquedas recientes */
+function loadBusquedasRecientes() {
+    busquedas_recientes.innerHTML = ''
+    recientes.forEach(el => {
+        const li = `<li>${el}</li>`
+         
+        busquedas_recientes.innerHTML += li;
+    })
+}
 
+/* Evento  para  activar la busqueda de libro al pulsar enter */
 search.addEventListener('keydown', (e) => {
 
     if (e.keyCode === 13) {
-        filterBooks(books, book_list, search)
-        if (recientes.length === 6) {
-            recientes.pop()
+        filterBooks(books, book_list, search.value)
+       
+
+        if(!recientes.includes(search.value)){
+            recientes.unshift(search.value)
+            localStorage.setItem('rc', JSON.stringify(recientes));
+
+            recientes.length > 6 && recientes.pop()
         }
-        recientes.unshift(search.value)
-        localStorage.setItem('rc', JSON.stringify(recientes))
+        
+        
     }
-
+    busquedas_recientes.style.display = 'none'
 })
-
+/* Abre el historial de busquedas recientes */
 search.addEventListener('click', () => {
+    loadBusquedasRecientes();
     busquedas_recientes.style.display = 'block'
 })
+/* Evento click con delegacion de eventos para obtener el texto de busqueda reciente */
 busquedas_recientes.addEventListener('click', (e) => {
     const target = e.target;
 
     if (target.tagName === 'LI') {
-        console.log(target.id);
+        filterBooks(books, book_list, target.textContent)
         busquedas_recientes.style.display = 'none'
     }
 })
-
-console.log(recientes);
+ 
